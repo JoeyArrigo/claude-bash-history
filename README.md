@@ -1,6 +1,6 @@
 # claude-bash-history
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) hook that logs every Bash tool invocation to a structured JSONL file. Gives you a persistent, greppable history of what commands Claude ran, when, where, and why — across all sessions and projects.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that logs every Bash tool invocation to a structured JSONL file. Gives you a persistent, greppable history of what commands Claude ran, when, where, and why — across all sessions and projects.
 
 ## Why
 
@@ -14,9 +14,9 @@ So we built one. Now every Bash tool invocation is logged to a structured JSONL 
 - **Debug** a failed workflow by checking which commands errored
 - **Track patterns** across projects and branches
 
-...this hook gives you that for free, automatically.
+...this plugin gives you that for free, automatically.
 
-The project also includes a [skill](#skill) so that Claude itself can search the log — filling in gaps around git history, checking what actions have already been taken, or catching things that might be missing.
+The plugin also includes a [skill](#skill) so that Claude itself can search the log — filling in gaps around git history, checking what actions have already been taken, or catching things that might be missing.
 
 ## Sample output
 
@@ -27,31 +27,33 @@ The project also includes a [skill](#skill) so that Claude itself can search the
 
 ## Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (hooks support)
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) v1.0.33+ (plugin support)
 - [`jq`](https://jqlang.github.io/jq/) (JSON processing)
 
 ## Install
 
+### From a plugin marketplace
+
+If this plugin is available in a marketplace you've configured:
+
+```bash
+claude plugin install bash-history
+```
+
+### Local development / testing
+
 ```bash
 git clone https://github.com/JoeyArrigo/claude-bash-history.git
-cd claude-bash-history
-bash install.sh
+claude --plugin-dir ./claude-bash-history
 ```
 
-The installer:
-1. Copies `log-bash.sh` to `~/.claude/hooks/`
-2. Registers a `PostToolUse` hook in `~/.claude/settings.json`
-3. Symlinks the `bash-history` skill into `~/.claude/skills/`
-
-Logging starts on your next Claude Code session.
-
-## Uninstall
+### Uninstall
 
 ```bash
-bash uninstall.sh
+claude plugin uninstall bash-history
 ```
 
-Removes the hook script, settings entry, and skill symlink. Your log file is preserved.
+Your log file (`~/.claude/bash_history.jsonl`) is preserved.
 
 ## Configuration
 
@@ -73,7 +75,7 @@ Each line in the JSONL file is a JSON object with these fields:
 |---|---|---|
 | `ts` | string | ISO 8601 UTC timestamp |
 | `session` | string | Claude Code session ID |
-| `project` | string | Git root (or cwd if not a repo) |
+| `project` | string | Git root (empty if not a repo) |
 | `cwd` | string | Working directory when the command ran |
 | `branch` | string | Git branch (empty if not a repo) |
 | `command` | string | The shell command that was executed |
@@ -112,20 +114,18 @@ jq -r .command ~/.claude/bash_history.jsonl | sort | uniq -c | sort -rn | head -
 
 ## Skill
 
-The installer sets up a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that lets Claude search the log automatically. Claude will use it when:
+The plugin includes a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that lets Claude search the log automatically. Claude will use it when:
 
 - You ask "how did I/you do X before?"
 - It needs to verify what actions were already taken
 - Something seems missing from the current state
 - You want to review commands from a prior session
 
-You can also invoke it manually with `/bash-history` in Claude Code.
-
-The skill lives in `skill/bash-history/SKILL.md` and is symlinked to `~/.claude/skills/bash-history` by the installer.
+You can also invoke it manually with `/bash-history:bash-history` in Claude Code.
 
 ## How it works
 
-Claude Code [hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) let you run shell commands in response to tool events. This project registers a `PostToolUse` hook that triggers after every Bash tool call. The hook receives the tool invocation details as JSON on stdin, enriches it with git context, and appends a single JSONL line to the log file.
+This is a Claude Code [plugin](https://code.claude.com/docs/en/plugins) that bundles a `PostToolUse` hook and a search skill. The hook triggers after every Bash tool call, receives the tool invocation details as JSON on stdin, enriches it with git context, and appends a single JSONL line to the log file.
 
 The hook is designed to be invisible — it runs silently, suppresses all errors, and always exits 0 so it never interferes with Claude Code's operation.
 

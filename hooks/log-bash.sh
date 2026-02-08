@@ -18,7 +18,7 @@ main() {
   local branch="" project=""
   if [ -n "$cwd" ] && [ -d "$cwd" ]; then
     branch=$(cd "$cwd" && git branch --show-current 2>/dev/null || true)
-    project=$(cd "$cwd" && git rev-parse --show-toplevel 2>/dev/null || echo "$cwd")
+    project=$(cd "$cwd" && git rev-parse --show-toplevel 2>/dev/null || true)
   fi
 
   # ISO 8601 timestamp

@@ -1,0 +1,9 @@
+{
+  "name": "bash-history",
+  "description": "Logs every Bash tool invocation to a structured JSONL file with git context, searchable across sessions and projects",
+  "version": "1.0.0",
+  "author": { "name": "Joey Arrigo" },
+  "repository": "https://github.com/JoeyArrigo/claude-bash-history",
+  "license": "BSD-2-Clause",
+  "keywords": ["bash", "history", "logging", "audit"]
+}

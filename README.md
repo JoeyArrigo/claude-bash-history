@@ -32,13 +32,14 @@ The plugin also includes a [skill](#skill) so that Claude itself can search the 
 
 ## Install
 
-### From a plugin marketplace
-
-If this plugin is available in a marketplace you've configured:
+Add the marketplace and install the plugin:
 
 ```bash
-claude plugin install bash-history
+claude plugin marketplace add JoeyArrigo/claude-bash-history
+claude plugin install bash-history@joey-plugins
 ```
+
+Logging starts on your next Claude Code session.
 
 ### Local development / testing
 
@@ -50,7 +51,7 @@ claude --plugin-dir ./claude-bash-history
 ### Uninstall
 
 ```bash
-claude plugin uninstall bash-history
+claude plugin uninstall bash-history@joey-plugins
 ```
 
 Your log file (`~/.claude/bash_history.jsonl`) is preserved.

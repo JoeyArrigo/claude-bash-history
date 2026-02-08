@@ -1,0 +1,13 @@
+{
+  "name": "joey-plugins",
+  "owner": {
+    "name": "Joey Arrigo"
+  },
+  "plugins": [
+    {
+      "name": "bash-history",
+      "source": ".",
+      "description": "Logs every Bash tool invocation to a structured JSONL file with git context, searchable across sessions and projects"
+    }
+  ]
+}

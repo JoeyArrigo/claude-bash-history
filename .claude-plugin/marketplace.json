@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "bash-history",
-      "source": ".",
+      "source": "./",
       "description": "Logs every Bash tool invocation to a structured JSONL file with git context, searchable across sessions and projects"
     }
   ]

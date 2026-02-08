@@ -37,6 +37,19 @@ if [ -f "$SETTINGS_FILE" ] && command -v jq &>/dev/null; then
   fi
 fi
 
+# --- Remove skill symlink ---
+
+SKILL_LINK="$CLAUDE_DIR/skills/bash-history"
+
+if [ -L "$SKILL_LINK" ]; then
+  rm "$SKILL_LINK"
+  echo "  Removed skill symlink $SKILL_LINK"
+elif [ -d "$SKILL_LINK" ]; then
+  echo "  Skill directory at $SKILL_LINK is not a symlink — skipping (remove manually if desired)"
+else
+  echo "  Skill symlink not found (already removed?)"
+fi
+
 echo ""
 echo "Done! Your log file was preserved:"
 echo "  ~/.claude/bash_history.jsonl"

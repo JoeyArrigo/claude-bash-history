@@ -4,14 +4,19 @@ A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) hook that logs e
 
 ## Why
 
-Claude Code doesn't keep a dedicated log of the shell commands it runs. If you want to:
+This started with a simple frustration: Claude told me it couldn't do something I *knew* it had done before. I wanted to say "hey, you did this before with the command—" but I couldn't remember the exact command. If it were something *I* had run, I'd just search my shell history. But there was no equivalent for Claude's Bash tool calls.
 
+So we built one. Now every Bash tool invocation is logged to a structured JSONL file you can query with `jq`. Whether you want to:
+
+- **Recall** a command or approach from a previous session ("how did I do X before?")
 - **Audit** what happened in a session after the fact
-- **Resume context** in a new session by reviewing what was done before
+- **Resume context** by reviewing what was done before
 - **Debug** a failed workflow by checking which commands errored
 - **Track patterns** across projects and branches
 
-...this hook gives you that for free, automatically, in a format you can query with `jq`.
+...this hook gives you that for free, automatically.
+
+The project also includes a [skill](#skill) so that Claude itself can search the log — filling in gaps around git history, checking what actions have already been taken, or catching things that might be missing.
 
 ## Sample output
 
@@ -36,6 +41,7 @@ bash install.sh
 The installer:
 1. Copies `log-bash.sh` to `~/.claude/hooks/`
 2. Registers a `PostToolUse` hook in `~/.claude/settings.json`
+3. Symlinks the `bash-history` skill into `~/.claude/skills/`
 
 Logging starts on your next Claude Code session.
 
@@ -45,7 +51,7 @@ Logging starts on your next Claude Code session.
 bash uninstall.sh
 ```
 
-Removes the hook script and settings entry. Your log file is preserved.
+Removes the hook script, settings entry, and skill symlink. Your log file is preserved.
 
 ## Configuration
 
@@ -103,6 +109,19 @@ jq -s 'group_by(.session) | map({session: .[0].session, count: length, commands:
 # Unique commands ranked by frequency
 jq -r .command ~/.claude/bash_history.jsonl | sort | uniq -c | sort -rn | head -20
 ```
+
+## Skill
+
+The installer sets up a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that lets Claude search the log automatically. Claude will use it when:
+
+- You ask "how did I/you do X before?"
+- It needs to verify what actions were already taken
+- Something seems missing from the current state
+- You want to review commands from a prior session
+
+You can also invoke it manually with `/bash-history` in Claude Code.
+
+The skill lives in `skill/bash-history/SKILL.md` and is symlinked to `~/.claude/skills/bash-history` by the installer.
 
 ## How it works
 

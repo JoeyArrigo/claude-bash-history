@@ -80,8 +80,25 @@ else
   echo "  Created settings.json with hook config"
 fi
 
+# --- Install skill ---
+
+SKILLS_DIR="$CLAUDE_DIR/skills"
+SKILL_LINK="$SKILLS_DIR/bash-history"
+
+mkdir -p "$SKILLS_DIR"
+
+if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
+  echo "  Skill already installed at $SKILL_LINK (no changes)"
+else
+  ln -s "$SCRIPT_DIR/skill/bash-history" "$SKILL_LINK"
+  echo "  Linked skill to $SKILL_LINK"
+fi
+
 echo ""
 echo "Done! Bash commands will be logged starting with your next Claude Code session."
 echo ""
 echo "  Log file: ~/.claude/bash_history.jsonl"
 echo "  Override: export CLAUDE_BASH_HISTORY_FILE=/path/to/custom.jsonl"
+echo ""
+echo "  The bash-history skill lets Claude search the log automatically."
+echo "  You can also invoke it manually with /bash-history."
